@@ -26,7 +26,7 @@ IMAGE: tools
                              Output: mkosi.tools
                         Compression: none
                   Compression Level: 3
-                   Output Directory: /home/crystian/projetos/mkosi-image-build
+                   Output Directory: /home/usuarios/projetos/crystian/mkosi-image-build
                         Output Mode: default
                            Image ID: None
                       Image Version: None
@@ -36,7 +36,7 @@ IMAGE: tools
                  Repart Directories: none
                         Sector Size: default
                             Overlay: no
-                               Seed: 7b172ae0-04fb-42d2-a80e-5376ed058970
+                               Seed: 7adb5995-8b5c-4715-b770-9a35769c87d0
                       Clean Scripts: none
 
     CONTENT:
@@ -95,6 +95,7 @@ IMAGE: tools
                                      python3-virt-firmware
                                      qemu-efi-aarch64
                                      qemu-system
+                                     qemu-utils
                                      sbsigntool
                                      sed
                                      socat
@@ -134,7 +135,7 @@ IMAGE: tools
                   Source Date Epoch: none
 
                        Sync Scripts: none
-                    Prepare Scripts: /tmp/tmp0_at6k4r/resources/mkosi-tools/mkosi.prepare
+                    Prepare Scripts: /tmp/tmp8fkt9tx1/resources/mkosi-tools/mkosi.prepare
                       Build Scripts: none
                 Postinstall Scripts: none
                    Finalize Scripts: none
@@ -183,7 +184,7 @@ IMAGE: default-initrd
                              Output: initrd.cpio.zst
                         Compression: zstd
                   Compression Level: 3
-                   Output Directory: /home/crystian/projetos/mkosi-image-build/mkosi.output
+                   Output Directory: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.output
                         Output Mode: default
                            Image ID: None
                       Image Version: None
@@ -191,7 +192,7 @@ IMAGE: default-initrd
                  Repart Directories: none
                         Sector Size: default
                             Overlay: no
-                               Seed: 7b172ae0-04fb-42d2-a80e-5376ed058970
+                               Seed: 7adb5995-8b5c-4715-b770-9a35769c87d0
                       Clean Scripts: none
 
     CONTENT:
@@ -224,7 +225,7 @@ IMAGE: default-initrd
 
                          Base Trees: none
                      Skeleton Trees: none
-                        Extra Trees: /tmp/tmp0_at6k4r/resources/mkosi-initrd/mkosi.extra
+                        Extra Trees: /tmp/tmp8fkt9tx1/resources/mkosi-initrd/mkosi.extra
 
                     Remove Packages: dpkg
                        Remove Files: /usr/lib/systemd/catalog
@@ -383,7 +384,7 @@ IMAGE: vm-base
                              Output: vm-base_v1.0.0.raw
                         Compression: none
                   Compression Level: 3
-                   Output Directory: /home/crystian/projetos/mkosi-image-build/mkosi.output
+                   Output Directory: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.output
                         Output Mode: default
                            Image ID: vm-base_v1.0.0
                       Image Version: 1.0.0
@@ -393,7 +394,7 @@ IMAGE: vm-base
                  Repart Directories: none
                         Sector Size: default
                             Overlay: no
-                               Seed: 7b172ae0-04fb-42d2-a80e-5376ed058970
+                               Seed: 7adb5995-8b5c-4715-b770-9a35769c87d0
                       Clean Scripts: none
 
     CONTENT:
@@ -431,7 +432,7 @@ IMAGE: vm-base
                  With Documentation: yes
 
                          Base Trees: none
-                     Skeleton Trees: /home/crystian/projetos/mkosi-image-build/mkosi.base/vm/mkosi.skeleton
+                     Skeleton Trees: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.base/vm/mkosi.skeleton
                         Extra Trees: none
 
                     Remove Packages: none
@@ -444,7 +445,7 @@ IMAGE: vm-base
                       Build Scripts: none
                 Postinstall Scripts: none
                    Finalize Scripts: none
-                 Postoutput Scripts: /home/crystian/projetos/mkosi-image-build/mkosi.postoutput.d/99-incus-packager
+                 Postoutput Scripts: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.postoutput.d/99-incus-packager
 
                            Bootable: auto
                          Bootloader: systemd-boot
@@ -453,7 +454,7 @@ IMAGE: vm-base
               Unified Kernel Images: auto
         Unified Kernel Image Format: None
       Unified Kernel Image Profiles: none
-                            Initrds: /home/crystian/projetos/mkosi-image-build/mkosi.output/initrd
+                            Initrds: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.output/initrd
                     Initrd Profiles: none
                     Initrd Packages: none
            Initrd Volatile Packages: none
@@ -531,7 +532,7 @@ IMAGE: main
                              Output: image
                         Compression: none
                   Compression Level: 3
-                   Output Directory: /home/crystian/projetos/mkosi-image-build/mkosi.output
+                   Output Directory: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.output
                         Output Mode: default
                            Image ID: None
                       Image Version: None
@@ -541,7 +542,7 @@ IMAGE: main
                  Repart Directories: none
                         Sector Size: default
                             Overlay: no
-                               Seed: 7b172ae0-04fb-42d2-a80e-5376ed058970
+                               Seed: 7adb5995-8b5c-4715-b770-9a35769c87d0
                       Clean Scripts: none
 
     CONTENT:
@@ -566,7 +567,7 @@ IMAGE: main
                       Build Scripts: none
                 Postinstall Scripts: none
                    Finalize Scripts: none
-                 Postoutput Scripts: /home/crystian/projetos/mkosi-image-build/mkosi.postoutput.d/99-incus-packager
+                 Postoutput Scripts: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.postoutput.d/99-incus-packager
 
                            Bootable: auto
                          Bootloader: systemd-boot
@@ -604,23 +605,23 @@ IMAGE: main
                     SELinux Relabel: auto
 
     BUILD CONFIGURATION:
-                         Tools Tree: /home/crystian/projetos/mkosi-image-build/mkosi.tools
+                         Tools Tree: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.tools
             Tools Tree Certificates: yes
 
                  Extra Search Paths: none
                         Incremental: yes
              Use Only Package Cache: auto
                       Sandbox Trees: none
-                Workspace Directory: /home/crystian/.cache/mkosi
-                    Cache Directory: /home/crystian/projetos/mkosi-image-build/mkosi.cache
+                Workspace Directory: /home/usuarios/.cache/mkosi
+                    Cache Directory: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.cache
                           Cache Key: &d~&r~&a~&I
             Package Cache Directory: default
-                    Build Directory: /home/crystian/projetos/mkosi-image-build/mkosi.builddir
+                    Build Directory: /home/usuarios/projetos/crystian/mkosi-image-build/mkosi.builddir
                           Build Key: &d~&r~&a
                      Use Subvolumes: auto
                      Repart Offline: yes
                        Save History: no
-                      Build Sources: /home/crystian/projetos/mkosi-image-build
+                      Build Sources: /home/usuarios/projetos/crystian/mkosi-image-build
             Build Sources Ephemeral: no
                  Script Environment: none
                   Environment Files: none

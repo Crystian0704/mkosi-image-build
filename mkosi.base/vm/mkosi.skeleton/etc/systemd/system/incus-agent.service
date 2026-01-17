@@ -1,0 +1,22 @@
+[Unit]
+Description=Incus Agent
+Documentation=https://linuxcontainers.org/incus
+ConditionVirtualization=vm
+After=network-online.target local-fs.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/run/incus_agent
+# 1. Cria o ponto de montagem
+ExecStartPre=/bin/mkdir -p /run/incus_agent
+# 2. Monta o compartilhamento 9p que o Incus disponibiliza
+ExecStartPre=/bin/mount -t 9p config /run/incus_agent -o ro,trans=virtio,version=9p2000.L
+# 3. Executa o agente direto do compartilhamento
+ExecStart=/run/incus_agent/incus-agent
+# 4. Limpeza ao parar
+ExecStopPost=/bin/umount /run/incus_agent
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
