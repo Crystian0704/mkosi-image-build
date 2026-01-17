@@ -9,9 +9,3 @@ wheels/
 # Virtual environments
 .venv
 
-# Mkosi-generated files
-mkosi.cache/
-mkosi.tools/
-mkosi.output
-incus-images/*
-!incus-images/.gitkeep
