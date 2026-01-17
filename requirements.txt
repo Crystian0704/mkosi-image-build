@@ -1,0 +1,1 @@
+mkosi @ git+https://github.com/systemd/mkosi.git@df53510982b25517455b5f55794e1317e14e5f8d

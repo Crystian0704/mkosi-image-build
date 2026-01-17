@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -e
+
+# ==============================================================================
+# 1. Verificações e Definições
+# ==============================================================================
+
+if [[ -z "$IMAGE_ID" || "$IMAGE_ID" == "None" ]]; then
+    exit 0
+fi
+
+VERSION="${IMAGE_VERSION:-latest}"
+
+echo "🚀 [Incus] Processando artefatos para: $IMAGE_ID (v$VERSION)"
+
+# ==============================================================================
+# 2. Identificação e Conversão de Artefatos
+# ==============================================================================
+
+# Busca artefatos gerados pelo mkosi
+RAW_FILE=$(find "$OUTPUTDIR" -maxdepth 1 \( -name "*${IMAGE_ID}*.raw" -o -name "*${IMAGE_ID}*.img" \) | head -n 1)
+TAR_FILE=$(find "$OUTPUTDIR" -maxdepth 1 \( -name "*${IMAGE_ID}*.tar*" \) | head -n 1)
+
+FINAL_ARTIFACT=""
+CORE_NAME=""
+IMAGE_TYPE=""
+
+if [[ -f "$RAW_FILE" ]]; then
+    # --- MODO VM (DISCO) ---
+    echo "💿 [Incus] Detectado VM (Disco RAW): $(basename "$RAW_FILE")"
+    IMAGE_TYPE="virtual-machine"
+
+    # Preparar nome para QCOW2
+    BASENAME=$(basename "$RAW_FILE")
+    EXTENSION=".${RAW_FILE##*.}"
+    CORE_NAME="${BASENAME%$EXTENSION}"
+    QCOW2_FILE="$OUTPUTDIR/${CORE_NAME}.qcow2"
+
+    # Verificar se temos qemu-img
+    if ! command -v qemu-img &> /dev/null; then
+        echo "❌ [Incus] Erro: 'qemu-img' não encontrado. Instale com 'sudo apt install qemu-utils'."
+        exit 1
+    fi
+
+    # Converter RAW para QCOW2 (Comprimido)
+    echo "⚙️  [Incus] Convertendo para QCOW2 (isso pode demorar um pouco)..."
+    qemu-img convert -f raw -O qcow2 -c "$RAW_FILE" "$QCOW2_FILE"
+    
+    FINAL_ARTIFACT="$QCOW2_FILE"
+    echo "✅ [Incus] Conversão concluída: $(basename "$QCOW2_FILE")"
+
+elif [[ -f "$TAR_FILE" ]]; then
+    # --- MODO CONTAINER (TAR) ---
+    echo "📦 [Incus] Detectado Container (Tarball): $(basename "$TAR_FILE")"
+    IMAGE_TYPE="container"
+    FINAL_ARTIFACT="$TAR_FILE"
+    
+    # Tratamento do nome para remover extensões compostas (ex: .tar.zst)
+    FILENAME=$(basename "$TAR_FILE")
+    if [[ "$FILENAME" == *.tar.* ]]; then
+        EXTENSION=".tar.${FILENAME##*.tar.}"
+    else
+        EXTENSION=".${FILENAME##*.}"
+    fi
+    CORE_NAME="${FILENAME%$EXTENSION}"
+
+else
+    echo "⚠️  [Incus] Nenhum artefato compatível encontrado. Pulando etapa do Incus."
+    exit 0
+fi
+
+# ==============================================================================
+# 3. Geração do Metadata (Split Image)
+# ==============================================================================
+
+# O Incus exige um arquivo separado contendo o metadata.yaml e templates
+TARGET_DIR="$SRCDIR/metadata-incus"
+mkdir -p "$TARGET_DIR"
+
+METADATA_OUTPUT="$TARGET_DIR/${CORE_NAME}.tar"
+WORK_DIR=$(mktemp -d)
+trap 'rm -rf "$WORK_DIR"' EXIT
+mkdir -p "$WORK_DIR/templates"
+
+# --- Templates ---
+cat > "$WORK_DIR/templates/hostname.tpl" <<'EOF'
+{{ instance.name }}
+EOF
+
+cat > "$WORK_DIR/templates/hosts.tpl" <<'EOF'
+127.0.0.1       localhost
+127.0.1.1       {{ instance.name }}
+::1             localhost ip6-localhost ip6-loopback
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
+
+# --- Metadata YAML ---
+ARCH="$ARCHITECTURE"
+[[ "$ARCH" == "x86-64" ]] && ARCH="x86_64"
+[[ "$ARCH" == "arm64" ]] && ARCH="aarch64"
+
+# Criação do YAML
+cat > "$WORK_DIR/metadata.yaml" <<EOF
+architecture: "$ARCH"
+creation_date: $(date +%s)
+properties:
+  description: "$CORE_NAME ($DISTRIBUTION $RELEASE) - $IMAGE_TYPE"
+  os: "$DISTRIBUTION"
+  release: "$RELEASE"
+  name: "$IMAGE_ID"
+  version: "$VERSION"
+  # Opcional: Define explicitamente o tipo, embora o Incus detecte pelo arquivo qcow2
+  type: "$IMAGE_TYPE" 
+templates:
+  /etc/hostname:
+    when: [start]
+    template: hostname.tpl
+  /etc/hosts:
+    when: [create, rename]
+    template: hosts.tpl
+    properties:
+      default: true
+EOF
+
+# Empacota apenas os metadados
+tar -C "$WORK_DIR" -czf "$METADATA_OUTPUT" .
+
+# ==============================================================================
+# 4. Saída Final
+# ==============================================================================
+
+ALIAS="$CORE_NAME"
+
+echo "✅ [Incus] Preparação concluída!"
+echo "   📄 Metadata: $METADATA_OUTPUT"
+echo "   💾 Rootfs:   $FINAL_ARTIFACT"
+echo ""
+echo "👉 COMANDO DE IMPORTAÇÃO (Split Image):"
+echo "   incus image import $METADATA_OUTPUT $FINAL_ARTIFACT --alias $ALIAS"
